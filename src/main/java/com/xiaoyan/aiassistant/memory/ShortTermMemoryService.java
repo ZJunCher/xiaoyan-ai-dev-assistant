@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+// Redis 短期记忆服务，负责窗口保留和摘要压缩。
 @Slf4j
 @Service
 @RequiredArgsConstructor
