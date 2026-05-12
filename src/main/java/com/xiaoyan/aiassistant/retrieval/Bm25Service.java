@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// 内存 BM25 关键词检索服务。
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -120,6 +121,7 @@ public class Bm25Service {
         return score;
     }
 
+    // 内部索引结构，缓存词频和长度以加速 BM25 计算。
     private record IndexedChunk(KbChunk chunk, Map<String, Integer> frequencies, int length) {
     }
 }
