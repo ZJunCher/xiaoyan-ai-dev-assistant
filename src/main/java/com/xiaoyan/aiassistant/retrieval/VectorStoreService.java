@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+// 向量存储服务，封装 embedding、写入、检索和删除。
 @Service
 public class VectorStoreService {
     private static final String DEFAULT_USER_ID = "default";
