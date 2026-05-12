@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
+// 绑定 app.* 业务配置，集中管理 RAG、记忆和 Pinecone 参数。
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
     private Pinecone pinecone = new Pinecone();
@@ -11,6 +12,7 @@ public class AppProperties {
     private Memory memory = new Memory();
 
     @Data
+    // Pinecone 向量库配置。
     public static class Pinecone {
         private boolean enabled;
         private String apiKey;
@@ -23,6 +25,7 @@ public class AppProperties {
     }
 
     @Data
+    // RAG 检索和重排序配置。
     public static class Rag {
         private int vectorTopK = 8;
         private int bm25TopK = 8;
@@ -37,8 +40,9 @@ public class AppProperties {
         private Reranker reranker = new Reranker();
     }
 
-    @Data
-    public static class Reranker {
+        @Data
+        // 外部 Reranker 服务配置。
+        public static class Reranker {
         private boolean enabled = false;
         private String baseUrl = "https://api.siliconflow.cn/v1/rerank";
         private String apiKey;
@@ -48,6 +52,7 @@ public class AppProperties {
     }
 
     @Data
+    // 短期记忆压缩配置。
     public static class Memory {
         private int maxTokenBudget = 32000;
         private int recentTokenBudget = 24000;
