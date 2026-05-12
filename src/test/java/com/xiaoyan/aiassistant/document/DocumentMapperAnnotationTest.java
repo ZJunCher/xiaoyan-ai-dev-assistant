@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// DocumentMapper 的 SQL 注解保护测试。
 class DocumentMapperAnnotationTest {
 
     // 确保 Mapper 方法都有 SQL 注解，避免运行时才发现 MyBatis statement 不存在。
