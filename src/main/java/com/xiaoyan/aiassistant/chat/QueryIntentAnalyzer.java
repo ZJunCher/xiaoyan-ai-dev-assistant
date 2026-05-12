@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
+// 基于规则和 HanLP 特征筛选潜在多意图问题。
 @Component
 public class QueryIntentAnalyzer {
     private static final int MIN_COMPLEX_QUERY_LENGTH = 16;
