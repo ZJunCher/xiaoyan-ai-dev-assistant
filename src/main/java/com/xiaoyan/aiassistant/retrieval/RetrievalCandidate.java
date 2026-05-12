@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+// 检索阶段的候选片段对象。
 public class RetrievalCandidate {
     private String id;
     private Long documentId;
