@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+// 基于 embedding 相似度的语义去重服务。
 @Slf4j
 @Service
 @RequiredArgsConstructor
