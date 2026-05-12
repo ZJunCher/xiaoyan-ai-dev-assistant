@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+// 数据库中的知识库 chunk 实体。
 public class KbChunk {
     private Long id;
     private Long documentId;
