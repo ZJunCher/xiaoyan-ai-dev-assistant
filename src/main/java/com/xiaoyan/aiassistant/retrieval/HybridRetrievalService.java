@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+// 混合检索服务，融合向量召回、BM25、去重和精排。
 @Service
 @RequiredArgsConstructor
 public class HybridRetrievalService {
@@ -22,10 +23,12 @@ public class HybridRetrievalService {
     private final SemanticDeduplicationService semanticDeduplicationService;
     private final RerankerService rerankerService;
 
+    // 兼容单 query 检索入口。
     public List<RetrievalCandidate> retrieveKnowledge(String query) {
         return retrieveKnowledge(List.of(query), query);
     }
 
+    // 同时执行多路向量检索和关键词检索。
     public List<RetrievalCandidate> retrieveKnowledge(List<String> semanticQueries, String keywordQuery) {
         List<List<RetrievalCandidate>> vectorGroups = new ArrayList<>();
 
@@ -51,10 +54,12 @@ public class HybridRetrievalService {
         return rerankerService.rerank(rerankQuery(semanticQueries, keywordQuery), deduplicated, properties.getRag().getFinalTopK());
     }
 
+    // 兼容单 query 长期记忆检索入口。
     public List<RetrievalCandidate> retrieveLongMemory(String userId, String query) {
         return retrieveLongMemory(userId, List.of(query));
     }
 
+    // 从 memory namespace 按用户过滤召回长期记忆。
     public List<RetrievalCandidate> retrieveLongMemory(String userId, List<String> semanticQueries) {
         List<List<RetrievalCandidate>> vectorGroups = new ArrayList<>();
 
@@ -64,10 +69,12 @@ public class HybridRetrievalService {
         return fuseMultiple(vectorGroups, List.of(), 4);
     }
 
+    // 融合单路向量结果和单路关键词结果。
     public List<RetrievalCandidate> fuse(List<RetrievalCandidate> vectorResults, List<RetrievalCandidate> keywordResults, int limit) {
         return fuseMultiple(List.of(vectorResults), List.of(keywordResults), limit);
     }
 
+    // 使用 RRF 融合多 query 和多通道检索结果。
     public List<RetrievalCandidate> fuseMultiple(List<List<RetrievalCandidate>> vectorGroups,
                                                  List<List<RetrievalCandidate>> keywordGroups,
                                                  int limit) {
@@ -88,6 +95,7 @@ public class HybridRetrievalService {
                 .toList();
     }
 
+    // 按排名累加 RRF 分数，并按 chunkId 去重。
     private void addRanked(Map<String, RetrievalCandidate> merged, List<RetrievalCandidate> candidates, boolean vector) {
         if (candidates == null) {
             return;
@@ -108,6 +116,7 @@ public class HybridRetrievalService {
         }
     }
 
+    // 清理空 query 并去重。
     private List<String> normalizeQueries(List<String> queries) {
         if (queries == null) {
             return List.of();
@@ -119,6 +128,7 @@ public class HybridRetrievalService {
                 .toList();
     }
 
+    // 精排优先使用关键词增强后的 query。
     private String rerankQuery(List<String> semanticQueries, String keywordQuery) {
         if (StringUtils.hasText(keywordQuery)) {
             return keywordQuery;
@@ -126,6 +136,7 @@ public class HybridRetrievalService {
         return String.join("\n", normalizeQueries(semanticQueries));
     }
 
+    // 内容更完整且带标题的片段给少量加权。
     private double completenessBoost(RetrievalCandidate candidate) {
         int length = candidate.getContent() == null ? 0 : candidate.getContent().length();
 
