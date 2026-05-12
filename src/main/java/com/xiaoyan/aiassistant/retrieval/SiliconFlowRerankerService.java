@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+// SiliconFlow Reranker API 的实现。
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -103,13 +104,16 @@ public class SiliconFlowRerankerService implements RerankerService {
         return candidates.stream().limit(Math.max(topK, 0)).toList();
     }
 
+    // SiliconFlow 精排请求体。
     private record RerankRequest(String model, String query, List<String> documents, Integer top_n,
                                  Boolean return_documents) {
     }
 
+    // SiliconFlow 精排响应体。
     private record RerankResponse(List<RerankResult> results) {
     }
 
+    // 单条精排结果，index 对应候选列表下标。
     private record RerankResult(Integer index, Double relevance_score) {
     }
 }
