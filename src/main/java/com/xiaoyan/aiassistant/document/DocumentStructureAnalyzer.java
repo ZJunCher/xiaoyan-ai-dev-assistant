@@ -6,6 +6,7 @@ import org.springframework.util.StringUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// 分析文档标题、段落和格式标记等结构特征。
 @Component
 public class DocumentStructureAnalyzer {
     static final Pattern HEADING = Pattern.compile(
