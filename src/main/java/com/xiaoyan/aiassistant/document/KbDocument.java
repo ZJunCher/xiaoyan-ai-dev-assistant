@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+// 数据库中的知识库文档实体。
 public class KbDocument {
     private Long id;
     private String fileName;
