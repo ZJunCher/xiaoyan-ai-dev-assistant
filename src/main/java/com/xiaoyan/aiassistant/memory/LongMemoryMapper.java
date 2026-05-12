@@ -10,6 +10,7 @@ import java.util.List;
 
 @Mapper
 @SuppressWarnings("SqlResolve")
+// 长期记忆的 MyBatis 数据访问接口。
 public interface LongMemoryMapper {
 
     // 插入用户主动录入的长期记忆，user_id 用于做到用户级隔离。
