@@ -7,8 +7,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// SiliconFlowRerankerService 的降级逻辑测试。
 class SiliconFlowRerankerServiceTest {
 
+    // 验证关闭精排时返回原始 Top-K。
     @Test
     void returnsOriginalTopKWhenRerankerDisabled() {
         AppProperties properties = new AppProperties();
@@ -24,6 +26,7 @@ class SiliconFlowRerankerServiceTest {
         assertThat(results).extracting(RetrievalCandidate::getChunkId).containsExactly(1L, 2L);
     }
 
+    // 构造测试用候选片段。
     private RetrievalCandidate candidate(Long chunkId) {
         return new RetrievalCandidate("v-" + chunkId, 1L, chunkId, "测试文档", "doc", "Redis 缓存穿透说明", 0, 0, 0);
     }
