@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
+// 配置知识库和长期记忆的向量存储 Bean。
 @Slf4j
 @Configuration
 @EnableConfigurationProperties(AppProperties.class)
