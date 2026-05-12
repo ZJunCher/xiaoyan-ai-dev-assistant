@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+// 负责把记忆、检索片段和用户问题组装成最终 Prompt。
 @Component
 public class PromptBuilder {
 
