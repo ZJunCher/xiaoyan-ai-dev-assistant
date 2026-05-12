@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// 文档分块服务，统一封装策略路由和实际切分。
 @Service
 @RequiredArgsConstructor
 public class DocumentChunkingService {
@@ -13,6 +14,7 @@ public class DocumentChunkingService {
     private final SemanticChunker semanticChunker;
     private final HybridChunker hybridChunker;
 
+    // 先路由策略，再交给对应分块器执行。
     public List<DocumentChunk> split(String text) {
         ChunkingStrategyRouter.ChunkingDecision decision = router.route(text);
         return switch (decision.strategy()) {
