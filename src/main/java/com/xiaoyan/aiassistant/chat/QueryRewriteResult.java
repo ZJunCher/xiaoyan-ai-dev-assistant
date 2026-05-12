@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+// Query 重写结果，保存独立问题、子问题和扩展关键词。
 public record QueryRewriteResult(
         String rewrittenQuery,
         List<String> subQueries,
         List<String> expandedKeywords
 ) {
+    // 构造时统一清理空值和重复项。
     public QueryRewriteResult {
         rewrittenQuery = rewrittenQuery == null ? "" : rewrittenQuery.trim();
         subQueries = normalizeList(subQueries);
