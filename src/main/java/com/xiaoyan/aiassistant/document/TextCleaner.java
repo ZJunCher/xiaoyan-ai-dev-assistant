@@ -5,9 +5,11 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+// 文档文本清洗器。
 @Component
 public class TextCleaner {
 
+    // 清洗 Tika 提取结果，减少噪声进入分块和检索。
     public String clean(String text) {
         if (text == null) {
             return "";
@@ -23,6 +25,7 @@ public class TextCleaner {
         return removeRepeatedShortLines(normalized);
     }
 
+    // 去除连续重复短行，主要处理页眉页脚类噪声。
     private String removeRepeatedShortLines(String text) {
         String[] lines = text.split("\\n");
         Set<String> seen = new LinkedHashSet<>();
