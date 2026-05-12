@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+// 数据库中的长期记忆实体。
 public class LongMemory {
     private Long id;
     private String vectorId;
