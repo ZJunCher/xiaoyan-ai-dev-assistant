@@ -6,216 +6,653 @@
     <title>智能效研AI研发助手</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@3.4.27/dist/vue.global.prod.js"></script>
     <style>
+        /* 全局颜色变量，方便统一调整界面风格。 */
+        :root {
+            --bg: #f4f6fb;
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+            --line: #dde4ef;
+            --line-strong: #c7d2e3;
+            --text: #162033;
+            --muted: #66748a;
+            --primary: #1f57d6;
+            --primary-dark: #1743a6;
+            --green: #0f8a6a;
+            --amber: #a15c08;
+            --red: #c93434;
+            --shadow: 0 18px 45px rgba(22, 32, 51, .08);
+        }
+
+        /* 统一盒模型，避免布局宽度计算偏差。 */
         * { box-sizing: border-box; }
+
         body {
             margin: 0;
+            min-width: 320px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-            background: #f5f7fb;
-            color: #172033;
+            background: var(--bg);
+            color: var(--text);
         }
-        #app {
+
+        button, input, textarea { font: inherit; }
+
+        button {
+            min-height: 38px;
+            border: 0;
+            border-radius: 6px;
+            padding: 0 14px;
+            background: var(--primary);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background .16s ease, transform .16s ease, box-shadow .16s ease;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--primary-dark);
+            box-shadow: 0 8px 18px rgba(31, 87, 214, .18);
+            transform: translateY(-1px);
+        }
+
+        button.secondary {
+            background: #eef3fb;
+            color: #24324a;
+        }
+
+        button.secondary:hover:not(:disabled) {
+            background: #e1e9f7;
+            box-shadow: none;
+        }
+
+        button.danger {
+            background: #fff1f1;
+            color: var(--red);
+        }
+
+        button.danger:hover:not(:disabled) {
+            background: #ffe0e0;
+            box-shadow: none;
+        }
+
+        button:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        input, textarea {
+            width: 100%;
+            border: 1px solid var(--line-strong);
+            border-radius: 6px;
+            padding: 10px 11px;
+            background: #fff;
+            color: var(--text);
+            outline: none;
+            transition: border-color .16s ease, box-shadow .16s ease;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(31, 87, 214, .12);
+        }
+
+        textarea {
+            min-height: 88px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        /* 页面主布局：左侧知识管理，右侧问答工作区。 */
+        .app-shell {
             min-height: 100vh;
             display: grid;
-            grid-template-columns: 320px 1fr;
+            grid-template-columns: 360px minmax(0, 1fr);
         }
-        aside {
-            background: #fff;
-            border-right: 1px solid #dde3ee;
-            padding: 20px;
+
+        /* 左侧面板承载上传、记忆和文档列表。 */
+        .sidebar {
+            height: 100vh;
             overflow-y: auto;
+            border-right: 1px solid var(--line);
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            padding: 22px;
         }
-        main {
-            min-width: 0;
+
+        .brand {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
         }
-        header {
-            height: 64px;
-            padding: 0 24px;
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: #173f9f;
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+
+        .brand-title {
+            margin: 0;
+            font-size: 19px;
+            line-height: 1.25;
+        }
+
+        .brand-subtitle {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .metric {
+            min-height: 74px;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface);
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .metric-label {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .section {
+            margin-top: 18px;
+        }
+
+        .section-head {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #dde3ee;
-            background: #fff;
+            gap: 12px;
+            margin-bottom: 9px;
         }
-        h1 { margin: 0; font-size: 20px; }
-        h2 { margin: 22px 0 10px; font-size: 15px; }
-        button {
-            border: 0;
-            border-radius: 6px;
-            padding: 9px 12px;
-            background: #2454d6;
-            color: #fff;
-            cursor: pointer;
-            font-weight: 600;
+
+        .section-title {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 800;
         }
-        button.secondary { background: #edf1f7; color: #24324a; }
-        button.danger { background: #d83a3a; }
-        button:disabled { opacity: .55; cursor: not-allowed; }
-        input, textarea {
-            width: 100%;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            padding: 10px 11px;
-            font: inherit;
-            background: #fff;
-        }
-        textarea {
-            min-height: 84px;
-            resize: vertical;
-        }
+
         .panel {
-            border: 1px solid #dde3ee;
+            border: 1px solid var(--line);
             border-radius: 8px;
-            padding: 12px;
-            background: #fbfcff;
-            margin-bottom: 12px;
+            padding: 13px;
+            background: var(--surface);
+            box-shadow: 0 8px 24px rgba(22, 32, 51, .04);
         }
+
+        .stack {
+            display: grid;
+            gap: 9px;
+        }
+
         .row {
             display: flex;
             gap: 8px;
             align-items: center;
         }
-        .muted {
-            color: #69758a;
+
+        .row > button {
+            flex: 0 0 auto;
+        }
+
+        .hint, .status {
+            color: var(--muted);
             font-size: 12px;
+            line-height: 1.5;
         }
-        .doc {
-            padding: 10px 0;
-            border-bottom: 1px solid #e6ebf3;
+
+        .status {
+            min-height: 18px;
         }
-        .doc:last-child { border-bottom: 0; }
-        .doc-name {
+
+        .file-input {
+            display: none;
+        }
+
+        .file-picker {
+            min-height: 84px;
+            display: grid;
+            align-content: center;
+            gap: 7px;
+            border: 1px dashed var(--line-strong);
+            border-radius: 8px;
+            padding: 14px;
+            background: var(--surface-soft);
+            cursor: pointer;
+        }
+
+        .file-picker strong {
             font-size: 13px;
-            font-weight: 700;
+        }
+
+        .file-picker span {
+            color: var(--muted);
+            font-size: 12px;
             word-break: break-all;
         }
+
+        .doc-list {
+            display: grid;
+            gap: 9px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .doc-card {
+            display: grid;
+            gap: 8px;
+            padding: 11px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface-soft);
+        }
+
+        .doc-main {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .doc-name {
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.45;
+            word-break: break-all;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            min-height: 22px;
+            border-radius: 5px;
+            padding: 0 8px;
+            background: #eef3fb;
+            color: #44556d;
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .tag.ready {
+            background: #e8f6f1;
+            color: var(--green);
+        }
+
+        .tag.warn {
+            background: #fff5e7;
+            color: var(--amber);
+        }
+
+        .empty-state {
+            min-height: 92px;
+            display: grid;
+            place-items: center;
+            border: 1px dashed var(--line-strong);
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            text-align: center;
+            background: var(--surface-soft);
+        }
+
+        /* 右侧区域承载聊天主流程。 */
+        .workspace {
+            min-width: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            height: 70px;
+            flex: 0 0 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, .92);
+            padding: 0 26px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 20px;
+            line-height: 1.2;
+        }
+
+        .page-subtitle {
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .session-chip {
+            max-width: 260px;
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 0 10px;
+            background: var(--surface-soft);
+            color: var(--muted);
+            font-size: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chat-wrap {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 22px 26px;
+        }
+
+        /* 聊天面板使用固定边界，突出主要交互区域。 */
+        .chat-panel {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
         .chat {
             flex: 1;
             overflow-y: auto;
             padding: 24px;
+            background:
+                linear-gradient(180deg, rgba(248, 250, 252, .88), rgba(255, 255, 255, .96)),
+                repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(221, 228, 239, .32) 30px);
         }
+
         .message {
-            max-width: 880px;
-            margin: 0 auto 16px;
+            max-width: 940px;
+            margin: 0 auto 18px;
             display: flex;
+            gap: 10px;
         }
-        .message.user { justify-content: flex-end; }
-        .bubble {
-            max-width: min(760px, 86vw);
-            padding: 13px 15px;
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            flex: 0 0 32px;
+            display: grid;
+            place-items: center;
             border-radius: 8px;
-            line-height: 1.65;
+            background: #e8edf7;
+            color: #31435d;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .message.user .avatar {
+            order: 2;
+            background: #dfe8ff;
+            color: var(--primary);
+        }
+
+        .bubble {
+            max-width: min(760px, 76vw);
+            border-radius: 8px;
+            padding: 13px 15px;
+            line-height: 1.72;
             white-space: pre-wrap;
             word-break: break-word;
+            font-size: 14px;
         }
+
         .assistant .bubble {
+            border: 1px solid var(--line);
             background: #fff;
-            border: 1px solid #dfe6f0;
         }
+
         .user .bubble {
-            background: #2454d6;
+            background: var(--primary);
             color: #fff;
         }
-        footer {
-            border-top: 1px solid #dde3ee;
-            padding: 16px 24px;
+
+        .composer-shell {
+            border-top: 1px solid var(--line);
+            padding: 15px;
             background: #fff;
         }
+
         .composer {
-            max-width: 920px;
-            margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr auto auto;
+            grid-template-columns: minmax(0, 1fr) auto auto;
             gap: 10px;
             align-items: end;
         }
-        .status {
+
+        .composer textarea {
+            min-height: 54px;
+            max-height: 180px;
+            resize: vertical;
+        }
+
+        .chat-status {
             min-height: 20px;
             margin-top: 8px;
-            color: #5f6e84;
+            color: var(--muted);
             font-size: 12px;
         }
-        @media (max-width: 880px) {
-            #app { grid-template-columns: 1fr; }
-            aside {
-                max-height: 42vh;
-                border-right: 0;
-                border-bottom: 1px solid #dde3ee;
+
+        /* 中等屏幕下改为上下布局。 */
+        @media (max-width: 980px) {
+            .app-shell {
+                grid-template-columns: 1fr;
             }
-            .composer { grid-template-columns: 1fr; }
+
+            .sidebar {
+                height: auto;
+                max-height: none;
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .workspace {
+                min-height: 70vh;
+            }
+        }
+
+        /* 小屏幕下进一步压缩间距和按钮布局。 */
+        @media (max-width: 680px) {
+            .sidebar, .chat-wrap {
+                padding: 16px;
+            }
+
+            .topbar {
+                height: auto;
+                min-height: 72px;
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 16px;
+            }
+
+            .metric-grid, .composer {
+                grid-template-columns: 1fr;
+            }
+
+            .bubble {
+                max-width: calc(100vw - 92px);
+            }
+
+            .session-chip {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-<div id="app">
-    <aside>
-        <h1>智能效研AI研发助手</h1>
-        <div class="muted">面向团队研发文档、开发规范、新人培训和常见问题的智能知识库。</div>
-
-        <h2>当前用户</h2>
-        <div class="panel">
-            <input v-model="userId" @change="saveUserId" placeholder="例如：zhangsan">
-            <div class="status">长期记忆按用户 ID 隔离；不填写时使用 default。</div>
-        </div>
-
-        <h2>文档上传</h2>
-        <div class="panel">
-            <input type="file" ref="fileInput" accept=".pdf,.doc,.docx,.md,.txt,.ppt,.pptx,.xls,.xlsx">
-            <div class="row" style="margin-top:10px">
-                <button @click="uploadDocument" :disabled="uploading">{{ uploading ? '入库中' : '上传入库' }}</button>
-                <button class="secondary" @click="loadDocuments">刷新</button>
-            </div>
-            <div class="status">{{ uploadStatus }}</div>
-        </div>
-
-        <h2>长期记忆</h2>
-        <div class="panel">
-            <input v-model="memoryTitle" placeholder="标题">
-            <textarea v-model="memoryContent" placeholder="需要助手长期记住的个人偏好、固定背景或团队事实" style="margin-top:8px"></textarea>
-            <input v-model="memoryTags" placeholder="标签，可选" style="margin-top:8px">
-            <button style="margin-top:10px" @click="addMemory" :disabled="!memoryContent.trim()">保存记忆</button>
-            <div class="status">{{ memoryStatus }}</div>
-        </div>
-
-        <h2>文档列表</h2>
-        <div class="panel">
-            <div v-if="documents.length === 0" class="muted">暂无文档</div>
-            <div v-for="doc in documents" :key="doc.id" class="doc">
-                <div class="doc-name">{{ doc.fileName }}</div>
-                <div class="muted">{{ doc.status }} · {{ doc.chunkCount }} chunks</div>
-                <button class="danger" style="margin-top:8px" @click="deleteDocument(doc.id)">删除</button>
+<div id="app" class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">效研</div>
+            <div>
+                <h1 class="brand-title">智能效研AI研发助手</h1>
+                <div class="brand-subtitle">团队知识库、研发规范与新人培训问答入口</div>
             </div>
         </div>
-    </aside>
 
-    <main>
-        <header>
-            <h1>智能效研AI研发助手</h1>
-            <button class="secondary" @click="newSession">新会话</button>
-        </header>
+        <div class="metric-grid">
+            <div class="metric">
+                <div class="metric-value">{{ documents.length }}</div>
+                <div class="metric-label">已入库文档</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">{{ totalChunks }}</div>
+                <div class="metric-label">知识片段</div>
+            </div>
+        </div>
 
-        <section class="chat" ref="chatBox">
-            <div v-for="(msg, index) in messages" :key="index" :class="['message', msg.role]">
-                <div class="bubble">{{ msg.content }}</div>
+        <section class="section">
+            <div class="section-head">
+                <h2 class="section-title">当前用户</h2>
+                <span class="tag">userId</span>
+            </div>
+            <div class="panel stack">
+                <input v-model="userId" @change="saveUserId" placeholder="例如：zhangsan">
+                <div class="hint">长期记忆按用户 ID 隔离；不填写时使用 default。</div>
             </div>
         </section>
 
-        <footer>
-            <div class="composer">
-                <textarea v-model="input" @keydown.enter.exact.prevent="send" placeholder="询问项目文档、开发规范、部署流程、新人培训问题..."></textarea>
-                <button @click="send" :disabled="loading || !input.trim()">发送</button>
-                <button class="secondary" @click="stop" :disabled="!loading">停止</button>
+        <section class="section">
+            <div class="section-head">
+                <h2 class="section-title">文档上传</h2>
+                <span class="tag warn">Tika 解析</span>
             </div>
-            <div class="composer">
-                <div class="status">{{ chatStatus }}</div>
+            <div class="panel stack">
+                <label class="file-picker" for="document-file">
+                    <strong>{{ selectedFileName || '选择或拖入团队文档' }}</strong>
+                    <span>支持 PDF、Word、Markdown、TXT、PPT、Excel</span>
+                </label>
+                <input id="document-file" class="file-input" type="file" ref="fileInput"
+                       accept=".pdf,.doc,.docx,.md,.txt,.ppt,.pptx,.xls,.xlsx"
+                       @change="onFileChange">
+                <div class="row">
+                    <button @click="uploadDocument" :disabled="uploading">{{ uploading ? '入库中' : '上传入库' }}</button>
+                    <button class="secondary" @click="loadDocuments">刷新</button>
+                </div>
+                <div class="status">{{ uploadStatus }}</div>
             </div>
-        </footer>
+        </section>
+
+        <section class="section">
+            <div class="section-head">
+                <h2 class="section-title">长期记忆</h2>
+                <span class="tag ready">主动录入</span>
+            </div>
+            <div class="panel stack">
+                <input v-model="memoryTitle" placeholder="标题">
+                <textarea v-model="memoryContent" placeholder="需要助手长期记住的个人偏好、固定背景或团队事实"></textarea>
+                <input v-model="memoryTags" placeholder="标签，可选">
+                <button @click="addMemory" :disabled="!memoryContent.trim()">保存记忆</button>
+                <div class="status">{{ memoryStatus }}</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-head">
+                <h2 class="section-title">文档列表</h2>
+                <button class="secondary" @click="loadDocuments">刷新</button>
+            </div>
+            <div class="doc-list">
+                <div v-if="documents.length === 0" class="empty-state">暂无文档，上传后会在这里显示。</div>
+                <div v-for="doc in documents" :key="doc.id" class="doc-card">
+                    <div class="doc-main">
+                        <div class="doc-name">{{ doc.fileName }}</div>
+                        <button class="danger" @click="deleteDocument(doc.id)">删除</button>
+                    </div>
+                    <div class="tag-row">
+                        <span :class="['tag', doc.status === 'READY' ? 'ready' : 'warn']">{{ doc.status }}</span>
+                        <span class="tag">{{ doc.chunkCount }} chunks</span>
+                        <span class="tag">{{ formatSize(doc.fileSize) }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </aside>
+
+    <main class="workspace">
+        <header class="topbar">
+            <div>
+                <h1 class="page-title">研发知识问答</h1>
+                <div class="page-subtitle">结合短期记忆、长期记忆与团队知识库生成回答</div>
+            </div>
+            <div class="row">
+                <span class="session-chip">session: {{ sessionId }}</span>
+                <button class="secondary" @click="newSession">新会话</button>
+            </div>
+        </header>
+
+        <section class="chat-wrap">
+            <div class="chat-panel">
+                <div class="chat" ref="chatBox">
+                    <div v-for="(msg, index) in messages" :key="index" :class="['message', msg.role]">
+                        <div class="avatar">{{ msg.role === 'user' ? '我' : 'AI' }}</div>
+                        <div class="bubble">{{ msg.content }}</div>
+                    </div>
+                </div>
+
+                <div class="composer-shell">
+                    <div class="composer">
+                        <textarea v-model="input" @keydown.enter.exact.prevent="send"
+                                  placeholder="询问项目文档、开发规范、部署流程、新人培训问题..."></textarea>
+                        <button @click="send" :disabled="loading || !input.trim()">发送</button>
+                        <button class="secondary" @click="stop" :disabled="!loading">停止</button>
+                    </div>
+                    <div class="chat-status">{{ chatStatus }}</div>
+                </div>
+            </div>
+        </section>
     </main>
 </div>
 
 <script>
-const { createApp, ref, nextTick, onMounted } = Vue;
+const { createApp, ref, computed, nextTick, onMounted } = Vue;
 
 createApp({
     setup() {
@@ -232,21 +669,42 @@ createApp({
         const memoryTitle = ref('');
         const memoryContent = ref('');
         const memoryTags = ref('');
+        const selectedFileName = ref('');
         const fileInput = ref(null);
         const chatBox = ref(null);
         let controller = null;
 
+        // 统计已入库文档的 chunk 总数。
+        const totalChunks = computed(() => documents.value.reduce((sum, doc) => sum + (doc.chunkCount || 0), 0));
+
+        // 空用户统一归入 default。
         const currentUserId = () => userId.value.trim() || 'default';
 
+        // 保存当前用户 ID，刷新页面后仍能使用。
         const saveUserId = () => {
             userId.value = currentUserId();
             localStorage.setItem('xiaoyanUserId', userId.value);
         };
 
+        // 新消息出现后滚动到底部。
         const scrollBottom = () => nextTick(() => {
             if (chatBox.value) chatBox.value.scrollTop = chatBox.value.scrollHeight;
         });
 
+        // 将字节数格式化为易读的文件大小。
+        const formatSize = (size) => {
+            if (!size && size !== 0) return '未知大小';
+            if (size < 1024) return `${size} B`;
+            if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+            return `${(size / 1024 / 1024).toFixed(1)} MB`;
+        };
+
+        // 选择文件后同步展示文件名。
+        const onFileChange = () => {
+            selectedFileName.value = fileInput.value?.files?.[0]?.name || '';
+        };
+
+        // 创建新的前端会话 ID。
         const newSession = () => {
             sessionId.value = String(Date.now());
             messages.value = [{ role: 'assistant', content: '已开启新会话。' }];
@@ -254,6 +712,7 @@ createApp({
             scrollBottom();
         };
 
+        // 发送用户问题并读取流式回答。
         const send = async () => {
             if (!input.value.trim() || loading.value) return;
             saveUserId();
@@ -298,10 +757,12 @@ createApp({
             }
         };
 
+        // 中止当前流式回答。
         const stop = () => {
             if (controller) controller.abort();
         };
 
+        // 上传文档并等待后端完成入库。
         const uploadDocument = async () => {
             const file = fileInput.value?.files?.[0];
             if (!file) {
@@ -320,6 +781,7 @@ createApp({
                 const result = await response.json();
                 uploadStatus.value = `入库完成：${result.chunkCount} 个片段`;
                 fileInput.value.value = '';
+                selectedFileName.value = '';
                 await loadDocuments();
             } catch (error) {
                 uploadStatus.value = '上传失败：' + error.message;
@@ -328,16 +790,19 @@ createApp({
             }
         };
 
+        // 从后端加载文档列表。
         const loadDocuments = async () => {
             const response = await fetch('/api/documents');
             if (response.ok) documents.value = await response.json();
         };
 
+        // 删除文档并刷新列表。
         const deleteDocument = async (id) => {
             await fetch(`/api/documents/${id}`, { method: 'DELETE' });
             await loadDocuments();
         };
 
+        // 主动保存一条长期记忆。
         const addMemory = async () => {
             saveUserId();
             memoryStatus.value = '正在保存长期记忆...';
@@ -362,6 +827,7 @@ createApp({
             }
         };
 
+        // 页面加载后初始化用户和文档列表。
         onMounted(() => {
             saveUserId();
             loadDocuments();
@@ -369,8 +835,9 @@ createApp({
 
         return {
             userId, sessionId, messages, input, loading, uploading, chatStatus, uploadStatus, memoryStatus,
-            documents, memoryTitle, memoryContent, memoryTags, fileInput, chatBox,
-            saveUserId, newSession, send, stop, uploadDocument, loadDocuments, deleteDocument, addMemory
+            documents, memoryTitle, memoryContent, memoryTags, selectedFileName, totalChunks, fileInput, chatBox,
+            saveUserId, newSession, send, stop, uploadDocument, loadDocuments, deleteDocument, addMemory,
+            onFileChange, formatSize
         };
     }
 }).mount('#app');
