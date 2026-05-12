@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// 负责调用大模型完成 Query 重写。
 @Slf4j
 @Service
 @RequiredArgsConstructor
