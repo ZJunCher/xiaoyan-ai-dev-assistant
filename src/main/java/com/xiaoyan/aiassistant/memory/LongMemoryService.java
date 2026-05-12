@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+// 长期记忆的录入、查询和向量化服务。
 @Service
 @RequiredArgsConstructor
 public class LongMemoryService {
