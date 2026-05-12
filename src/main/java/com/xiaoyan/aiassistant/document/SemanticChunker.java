@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+// 语义分块器，使用 embedding 相似度合并片段。
 @Component
 @RequiredArgsConstructor
 public class SemanticChunker {
@@ -18,10 +19,12 @@ public class SemanticChunker {
 
     private final EmbeddingModel embeddingModel;
 
+    // 默认从第 0 个 chunk 开始做语义分块。
     public List<DocumentChunk> split(String text) {
         return split(text, 0, "");
     }
 
+    // 基于相邻片段向量相似度合并语义接近的文本。
     public List<DocumentChunk> split(String text, int startIndex, String title) {
         List<String> units = semanticUnits(text);
         List<DocumentChunk> chunks = new ArrayList<>();
@@ -55,6 +58,7 @@ public class SemanticChunker {
         return chunks;
     }
 
+    // 先按空行得到语义单元，过长段落再继续拆句。
     private List<String> semanticUnits(String text) {
         List<String> units = new ArrayList<>();
         for (String block : safeText(text).split("\\n\\s*\\n")) {
@@ -71,10 +75,11 @@ public class SemanticChunker {
         return units;
     }
 
+    // 长段落按中文和英文句末标点继续拆分。
     private List<String> sentenceUnits(String text) {
         List<String> units = new ArrayList<>();
         StringBuilder buffer = new StringBuilder();
-        for (String sentence : text.split("(?<=[銆傦紒锛??])")) {
+        for (String sentence : text.split("(?<=[。！？?])")) {
             if (buffer.length() > MIN_CHARS && buffer.length() + sentence.length() > MAX_CHARS) {
                 units.add(buffer.toString());
                 buffer.setLength(0);
@@ -87,15 +92,18 @@ public class SemanticChunker {
         return units;
     }
 
+    // 生成最终分块对象并估算 token 数。
     private DocumentChunk chunk(int index, String title, String content) {
         String trimmed = content.trim();
         return new DocumentChunk(index, title, title, trimmed, StructureAwareChunker.estimateTokens(trimmed));
     }
 
+    // 调用 embedding 模型获得文本向量。
     private Embedding embed(String text) {
         return embeddingModel.embed(text).content();
     }
 
+    // 计算两个 embedding 的余弦相似度。
     private double cosine(Embedding left, Embedding right) {
         float[] a = left.vector();
         float[] b = right.vector();
@@ -113,6 +121,7 @@ public class SemanticChunker {
         return dot / (Math.sqrt(normA) * Math.sqrt(normB));
     }
 
+    // 空文本统一转为空字符串。
     private String safeText(String text) {
         return text == null ? "" : text;
     }
