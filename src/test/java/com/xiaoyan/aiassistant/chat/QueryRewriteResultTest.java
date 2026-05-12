@@ -6,8 +6,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// QueryRewriteResult 的结果归一化测试。
 class QueryRewriteResultTest {
 
+    // 验证语义 query 去重和关键词拼接逻辑。
     @Test
     void buildsSemanticQueriesAndKeywordText() {
         QueryRewriteResult result = new QueryRewriteResult(
