@@ -12,6 +12,7 @@ import java.util.List;
 
 @Mapper
 @SuppressWarnings("SqlResolve")
+// 文档和 chunk 的 MyBatis 数据访问接口。
 public interface DocumentMapper {
 
     // 插入文档元数据，id 由 MySQL 自增生成后回填到实体。
