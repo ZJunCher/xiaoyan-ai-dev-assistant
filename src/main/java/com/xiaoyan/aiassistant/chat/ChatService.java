@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
+// 负责在线问答主链路编排。
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -40,18 +41,21 @@ public class ChatService {
             String prompt = promptBuilder.build(message, rewrite, memory, longMemories, knowledge);
             StringBuilder answer = new StringBuilder();
             streamingChatModel.chat(prompt, new StreamingChatResponseHandler() {
+                // 收到流式片段后立即推给前端。
                 @Override
                 public void onPartialResponse(String partialResponse) {
                     answer.append(partialResponse);
                     sink.next(partialResponse);
                 }
 
+                // 完整回答结束后写入短期记忆。
                 @Override
                 public void onCompleteResponse(ChatResponse completeResponse) {
                     shortTermMemoryService.append(memorySessionId, message, answer.toString());
                     sink.complete();
                 }
 
+                // 模型调用异常时交给响应流向前端暴露。
                 @Override
                 public void onError(Throwable error) {
                     sink.error(error);
