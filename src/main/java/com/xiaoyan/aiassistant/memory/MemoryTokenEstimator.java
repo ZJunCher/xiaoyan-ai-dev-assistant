@@ -4,9 +4,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+// 短期记忆的轻量 token 估算器。
 @Component
 public class MemoryTokenEstimator {
 
+    // 估算摘要和最近对话的总 token。
     public int estimateMemoryTokens(String summary, List<ChatTurn> turns) {
         int total = estimateText(summary);
         for (ChatTurn turn : turns) {
@@ -15,6 +17,7 @@ public class MemoryTokenEstimator {
         return total;
     }
 
+    // 单轮消息额外加入角色名和格式开销。
     public int estimateTurn(ChatTurn turn) {
         if (turn == null) {
             return 0;
@@ -22,6 +25,7 @@ public class MemoryTokenEstimator {
         return 6 + estimateText(turn.role()) + estimateText(turn.content());
     }
 
+    // 中文按 1 token 估算，英文数字按约 4 字符 1 token。
     public int estimateText(String text) {
         if (text == null || text.isBlank()) {
             return 0;
