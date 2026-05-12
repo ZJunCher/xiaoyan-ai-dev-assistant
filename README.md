@@ -26,7 +26,7 @@
 - 关键词检索：内存 BM25
 - 中文分词：HanLP
 - 缓存与短期记忆：Redis
-- 数据库：MySQL
+- 元数据存储：MySQL
 - ORM：MyBatis
 - 前端：Vue 3 CDN + 原生 HTML/CSS
 
