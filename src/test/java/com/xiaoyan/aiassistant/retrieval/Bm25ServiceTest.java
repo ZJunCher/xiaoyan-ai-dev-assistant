@@ -10,8 +10,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+// Bm25Service 的关键词排序测试。
 class Bm25ServiceTest {
 
+    // 验证关键词命中的 chunk 排在前面。
     @Test
     void ranksKeywordMatchedChunkFirst() {
         Bm25Service service = new Bm25Service(mock(DocumentMapper.class));
@@ -26,6 +28,7 @@ class Bm25ServiceTest {
         assertThat(results.get(0).getContent()).contains("Redis key");
     }
 
+    // 构造测试用 chunk。
     private KbChunk chunk(Long id, String content) {
         return new KbChunk(id, 1L, "v-" + id, id.intValue(), "规范", "规范", content, 10, LocalDateTime.now());
     }
