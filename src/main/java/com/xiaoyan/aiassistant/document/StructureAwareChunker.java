@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+// 结构感知分块器，优先保留标题和章节边界。
 @Component
 @RequiredArgsConstructor
 public class StructureAwareChunker {
@@ -129,6 +130,7 @@ public class StructureAwareChunker {
         return text == null ? "" : text;
     }
 
+    // 标题和文本块的中间结构。
     private record Section(String title, String text) {
     }
 }
